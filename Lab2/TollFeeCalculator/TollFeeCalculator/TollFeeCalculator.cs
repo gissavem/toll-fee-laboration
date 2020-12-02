@@ -1,62 +1,153 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TollFeeCalculatorApp
 {
     public class TollFeeCalculator
     {
+        private const int MAX_FEE = 60;
+        private const int ONE_HOUR = 60;
+        private FileReader _fileReader;
+        private DateParser _dateParser;
+        private ConsoleWriter _consoleWriter;
+
+        public TollFeeCalculator()
+        {
+           _fileReader = new FileReader();
+           _dateParser = new DateParser();
+           _consoleWriter = new ConsoleWriter();
+        }
         public void Run(string filePath)
         {
-            var fileReader = new FileReader();
-            var dateParser = new DateParser();
-            var consoleWriter = new ConsoleWriter();
-            var fileContent = fileReader.ReadFileToString(filePath);
-            var dates = dateParser.ParseDatesFromString(fileContent);
-            var totalFee = CalculateTotalFee(dates);
-            consoleWriter.PrintTotalFee(totalFee);
+            var fileContent = _fileReader.ReadFileToString(filePath);
+            var records = _dateParser.CreateTollRecordsFromString(fileContent);
+            var populatedRecords = PopulateRecordsWithFees(records);
+            var filteredRecords = RemoveFreeRecords(populatedRecords);
+            var totalFee = CalculateTotalFee(filteredRecords);
+            _consoleWriter.PrintTotalFee(totalFee);
         }
 
-        public int CalculateTotalFee(List<DateTime> dates) {
-            int fee = 0;
-            DateTime si = dates[0]; //Starting interval
-            foreach (var d2 in dates)
+        public int CalculateTotalFee(List<TollRecord> records) 
+        {
+            var totalFee = 0;
+            var initialRecord = records[0];
+            var currentInterval = new List<TollRecord>();
+            foreach (var record in records)
             {
-                long diffInMinutes = (d2 - si).Minutes;
-                if(diffInMinutes > 60) {
-                    fee += TollFeePass(d2);
-                    si = d2;
-                } else {
-                    fee += Math.Max(TollFeePass(d2), TollFeePass(si));
+                var timeDelta = _dateParser.GetTimeDelta(initialRecord.TimeStamp, record.TimeStamp);
+                if(timeDelta < ONE_HOUR)
+                {
+                    currentInterval.Add(record);
+                }
+                else 
+                {
+                    totalFee += GetHighestFeeInInterval(currentInterval);
+                    initialRecord = record;
+                    ResetInterval(currentInterval, record);
                 }
             }
-            return Math.Max(fee, 60);
+            totalFee += GetHighestFeeInInterval(currentInterval);
+            return Math.Min(totalFee, MAX_FEE);
         }
 
-        static int TollFeePass(DateTime d)
+
+        public List<TollRecord> PopulateRecordsWithFees(List<TollRecord> records)
         {
-            if (free(d)) return 0;
-            int hour = d.Hour;
-            int minute = d.Minute;
-            if (hour == 6 && minute >= 0 && minute <= 29) return 8;
-            else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
-            else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
-            else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
-            else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
-            else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-            else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
-            else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
-            else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
-            else return 0;
-        }
-        //Gets free dates
-        static bool free(DateTime day) {
-        return (int)day.DayOfWeek == 5 || (int)day.DayOfWeek == 6 || day.Month == 7;
+            foreach (var record in records)
+            {
+                record.Fee = GetFee(record.TimeStamp);
+            }
+            return records;
         }
 
-        public double GetDifferenceInMinutes(DateTime firstDateTime, DateTime secondDateTime)
+        public int GetHighestFeeInInterval(List<TollRecord> records)
         {
-            var timeSpan = secondDateTime - firstDateTime;
-            return timeSpan.TotalMinutes;
+            var feeToKeep = 0;
+            foreach (var record in records)
+            {
+                if (record.Fee > feeToKeep)
+                {
+                    feeToKeep = record.Fee;
+                }
+            }
+            return feeToKeep;
         }
+
+        public List<TollRecord> RemoveFreeRecords(List<TollRecord> records) => records.Where(record => record.HasValue).ToList();
+        
+
+        public int GetFee(DateTime timeStamp)
+        {
+            if (FreeDate(timeStamp)) 
+                return 0;
+            var hour = timeStamp.Hour;
+            var minute = timeStamp.Minute;
+            if (DoesCostEigth(hour, minute))
+                return 8;
+            else if (DoesCostThirteen(hour, minute))
+                return 13;
+            else if (DoesCostEighteen(hour, minute))
+                return 18;
+            else 
+                return 0;
+        }
+
+        private bool DoesCostEigth(int hour, int minute)
+        {
+            if (hour == 6 &&  minute <= 29)
+                return true;
+            else if ((hour == 8 && minute >= 30) || hour == 14 )
+                return true;
+            else if (hour == 18 && minute <= 29)
+                return true;
+            else
+                return false;
+        }
+       
+
+        private bool DoesCostThirteen(int hour, int minute)
+        {
+
+            if (hour == 6 && minute >= 30)
+                return true;
+            else if (hour == 8 && hour <= 29)
+                return true;
+            else if (hour == 15 && minute <= 29)
+                return true;
+            else if (hour == 17)
+                return true;
+            else
+                return false;
+        }
+
+        private bool DoesCostEighteen(int hour, int minute)
+        {
+
+            if (hour == 7)
+                return true;
+            else if ((hour == 15 && minute >= 30) || hour == 16 )
+                return true;
+            else
+                return false;
+        }
+      
+        private bool FreeDate(DateTime timeStamp) 
+        {
+            const int sunday = 0;
+            const int saturday = 6;
+            const int july = 7;
+            return (int)timeStamp.DayOfWeek == saturday 
+                || (int)timeStamp.DayOfWeek == sunday 
+                || timeStamp.Month == july;
+        }
+
+        private void ResetInterval(List<TollRecord> currentInterval, TollRecord currentRecord)
+        {
+            currentInterval.Clear();
+            currentInterval.Add(currentRecord);
+        }
+
+
     }
 }

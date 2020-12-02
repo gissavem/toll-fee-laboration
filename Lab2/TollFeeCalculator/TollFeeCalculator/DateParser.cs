@@ -8,10 +8,10 @@ namespace TollFeeCalculatorApp
 {
     public class DateParser
     {
-        public List<DateTime> ParseDatesFromString(string datesString)
+        public List<TollRecord> CreateTollRecordsFromString(string datesString)
         {
             string[] dateStrings = datesString.Split(", ");
-            List<DateTime> dates = new List<DateTime>();
+            List<TollRecord> records = new List<TollRecord>();
             for (int i = 0; i < dateStrings.Length; i++)
             {
                 var date = TryToParseDateFromString(dateStrings[i]);
@@ -19,9 +19,9 @@ namespace TollFeeCalculatorApp
                 {
                     continue;
                 }
-                dates.Add(date);
+                records.Add(new TollRecord(date));
             }
-            return dates;
+            return records;
         }
         private DateTime TryToParseDateFromString(string dateString)
         {
@@ -33,6 +33,12 @@ namespace TollFeeCalculatorApp
             {
                 return DateTime.MinValue;
             }
+        }
+
+        public double GetTimeDelta(DateTime firstDateTime, DateTime secondDateTime)
+        {
+            var timeSpan = secondDateTime - firstDateTime;
+            return timeSpan.TotalMinutes;
         }
     }
 }
