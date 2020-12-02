@@ -1,28 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace TollFeeCalculator
+namespace TollFeeCalculatorApp
 {
-    class Program
+    public class TollFeeCalculator
     {
-        static void Main()
+        public void Run(string filePath)
         {
-            run(Environment.CurrentDirectory + "../../../../testData.txt");
+            var fileReader = new FileReader();
+            var dateParser = new DateParser();
+            var consoleWriter = new ConsoleWriter();
+            var fileContent = fileReader.ReadFileToString(filePath);
+            var dates = dateParser.ParseDatesFromString(fileContent);
+            var totalFee = CalculateTotalFee(dates);
+            consoleWriter.PrintTotalFee(totalFee);
         }
 
-        static void run(String inputFile) {
-            string indata = System.IO.File.ReadAllText(inputFile);
-            String[] dateStrings = indata.Split(", ");
-            DateTime[] dates = new DateTime[dateStrings.Length-1];
-            for(int i = 0; i < dates.Length; i++) {
-                dates[i] = DateTime.Parse(dateStrings[i]);
-            }
-            Console.Write("The total fee for the inputfile is" + TotalFeeCost(dates));
-        }
-
-        static int TotalFeeCost(DateTime[] d) {
+        public int CalculateTotalFee(List<DateTime> dates) {
             int fee = 0;
-            DateTime si = d[0]; //Starting interval
-            foreach (var d2 in d)
+            DateTime si = dates[0]; //Starting interval
+            foreach (var d2 in dates)
             {
                 long diffInMinutes = (d2 - si).Minutes;
                 if(diffInMinutes > 60) {
@@ -54,6 +51,12 @@ namespace TollFeeCalculator
         //Gets free dates
         static bool free(DateTime day) {
         return (int)day.DayOfWeek == 5 || (int)day.DayOfWeek == 6 || day.Month == 7;
+        }
+
+        public double GetDifferenceInMinutes(DateTime firstDateTime, DateTime secondDateTime)
+        {
+            var timeSpan = secondDateTime - firstDateTime;
+            return timeSpan.TotalMinutes;
         }
     }
 }
