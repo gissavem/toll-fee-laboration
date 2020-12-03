@@ -109,7 +109,8 @@ namespace TollFeeCalculatorTests
             var eighthTimeSpan = new DateTime(2020, 1, 1, 17, 0, 0);
             var ninthTimeSpan = new DateTime(2020, 1, 1, 18, 15, 0);
             var tenthTimeSpan = new DateTime(2020, 1, 1, 3, 0, 0);
-
+            var eleventhTimeSpan = new DateTime(2020, 1, 1, 12, 0, 0);
+            
             var actualOne = tollFeecalulator.GetFee(firstTimeSpan);
             var actualTwo = tollFeecalulator.GetFee(secondTimeSpan);
             var actualThree = tollFeecalulator.GetFee(thirdTimeSpan);
@@ -120,6 +121,7 @@ namespace TollFeeCalculatorTests
             var actualEight = tollFeecalulator.GetFee(eighthTimeSpan);
             var actualNine = tollFeecalulator.GetFee(ninthTimeSpan);
             var actualTen = tollFeecalulator.GetFee(tenthTimeSpan);
+            var actualEleven = tollFeecalulator.GetFee(eleventhTimeSpan);
 
             Assert.AreEqual(expectEight, actualOne);
             Assert.AreEqual(expectThirteen, actualTwo);
@@ -131,6 +133,7 @@ namespace TollFeeCalculatorTests
             Assert.AreEqual(expectThirteen, actualEight);
             Assert.AreEqual(expectEight, actualNine);
             Assert.AreEqual(expectFree, actualTen);
+            Assert.AreEqual(expectEight, actualEleven);
         }
 
         [TestMethod]

@@ -8,14 +8,24 @@ namespace TollFeeCalculatorTests
     public class DateParserTests
     {
         [TestMethod]
-        public void DateParser_ThreeDates_ShouldReturnListWithThreeTollRecords()
+        public void CreateTollRecordsForOneDayFromString_ThreeTimeStamps_ShouldReturnListWithThreeTollRecords()
         {
             var dateParser = new DateParser();
             var expectedCount = 3;
             var validInput = "2020-06-30 00:05, 2020-06-30 06:34, 2020-06-30 08:52";
-            var dates = dateParser.CreateTollRecordsFromString(validInput);
+            var parsedRecords = dateParser.CreateTollRecordsForOneDayFromString(validInput);
 
-            Assert.AreEqual(expectedCount, dates.Count);
+            Assert.AreEqual(expectedCount, parsedRecords.Count);
+        }
+        [TestMethod]
+        public void CreateTollRecordsForOneDayFromString_DifferentDates_ShouldReturnListWithoutSecondDate()
+        {
+            var dateParser = new DateParser();
+            var expectedCount = 2;
+            var validInput = "2020-06-30 00:05, 2020-06-30 06:34, 2020-07-05 08:52";
+            var parsedRecords = dateParser.CreateTollRecordsForOneDayFromString(validInput);
+
+            Assert.AreEqual(expectedCount, parsedRecords.Count);
         }
         [TestMethod]
         public void DateParser_InvalidInput_ShouldReturnEmptyList()
@@ -23,16 +33,16 @@ namespace TollFeeCalculatorTests
             var dateParser = new DateParser();
             var invalidInput = "";
             var expectedCount = 0;
-            var dates = dateParser.CreateTollRecordsFromString(invalidInput);
+            var parsedRecords = dateParser.CreateTollRecordsForOneDayFromString(invalidInput);
 
-            Assert.AreEqual(expectedCount, dates.Count);
+            Assert.AreEqual(expectedCount, parsedRecords.Count);
         }
         [TestMethod]
         public void DateParser_InvalidInput_ShouldHandleException()
         {
             var dateParser = new DateParser();
             var invalidInput = "xasfasxasfas";
-            var dates = dateParser.CreateTollRecordsFromString(invalidInput);
+            var parsedRecords = dateParser.CreateTollRecordsForOneDayFromString(invalidInput);
         }
         [TestMethod]
         public void GetDifferenceInMinutes_ShouldReturn90()

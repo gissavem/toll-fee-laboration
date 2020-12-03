@@ -7,7 +7,7 @@ namespace TollFeeCalculatorApp
         public static void Main()
         {
             var tollFeeCalculator = new TollFeeCalculator();
-            tollFeeCalculator.Run(Environment.CurrentDirectory + "../../../../testData.txt");
+            tollFeeCalculator.CalculateFeeFromRecordsInFile(Environment.CurrentDirectory + "../../../../testData.txt");
         }
     }
 }

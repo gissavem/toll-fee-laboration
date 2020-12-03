@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TollFeeCalculatorApp
 {
     public class DateParser
     {
-        public List<TollRecord> CreateTollRecordsFromString(string datesString)
+        public List<TollRecord> CreateTollRecordsForOneDayFromString(string datesString)
         {
             var dateStrings = datesString.Split(", ");
             var records = new List<TollRecord>();
@@ -18,7 +19,8 @@ namespace TollFeeCalculatorApp
                 }
                 records.Add(new TollRecord(date));
             }
-            return records;
+            var recordsForSingleDay = records.Where(r => r.TimeStamp.Date == records[0].TimeStamp.Date).ToList();
+            return recordsForSingleDay;
         }
         private DateTime TryToParseDateFromString(string dateString)
         {

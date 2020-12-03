@@ -17,10 +17,10 @@ namespace TollFeeCalculatorApp
            _dateParser = new DateParser();
            _consoleWriter = new ConsoleWriter();
         }
-        public void Run(string filePath)
+        public void CalculateFeeFromRecordsInFile(string filePath)
         {
             var fileContent = _fileReader.ReadFileToString(filePath);
-            var records = _dateParser.CreateTollRecordsFromString(fileContent);
+            var records = _dateParser.CreateTollRecordsForOneDayFromString(fileContent);
             var populatedRecords = PopulateRecordsWithFees(records);
             var filteredRecords = RemoveFreeRecords(populatedRecords);
             var totalFee = CalculateTotalFee(filteredRecords);
