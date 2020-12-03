@@ -8,10 +8,9 @@ namespace TollFeeCalculatorApp
     {
         private const int MAX_FEE = 60;
         private const int ONE_HOUR = 60;
-        private FileReader _fileReader;
-        private DateParser _dateParser;
-        private ConsoleWriter _consoleWriter;
-
+        private readonly FileReader _fileReader;
+        private readonly DateParser _dateParser;
+        private readonly ConsoleWriter _consoleWriter;
         public TollFeeCalculator()
         {
            _fileReader = new FileReader();
@@ -27,7 +26,8 @@ namespace TollFeeCalculatorApp
             var totalFee = CalculateTotalFee(filteredRecords);
             _consoleWriter.PrintTotalFee(totalFee);
         }
-
+        public List<TollRecord> RemoveFreeRecords(List<TollRecord> records) => records.Where(record => record.HasFee).ToList();
+        public int GetHighestFeeInInterval(List<TollRecord> records) => records.Select(record => record.Fee).Max();
         public int CalculateTotalFee(List<TollRecord> records) 
         {
             var totalFee = 0;
@@ -50,8 +50,6 @@ namespace TollFeeCalculatorApp
             totalFee += GetHighestFeeInInterval(currentInterval);
             return Math.Min(totalFee, MAX_FEE);
         }
-
-
         public List<TollRecord> PopulateRecordsWithFees(List<TollRecord> records)
         {
             foreach (var record in records)
@@ -60,30 +58,13 @@ namespace TollFeeCalculatorApp
             }
             return records;
         }
-
-        public int GetHighestFeeInInterval(List<TollRecord> records)
-        {
-            var feeToKeep = 0;
-            foreach (var record in records)
-            {
-                if (record.Fee > feeToKeep)
-                {
-                    feeToKeep = record.Fee;
-                }
-            }
-            return feeToKeep;
-        }
-
-        public List<TollRecord> RemoveFreeRecords(List<TollRecord> records) => records.Where(record => record.HasValue).ToList();
-        
-
         public int GetFee(DateTime timeStamp)
         {
-            if (FreeDate(timeStamp)) 
-                return 0;
             var hour = timeStamp.Hour;
             var minute = timeStamp.Minute;
-            if (DoesCostEigth(hour, minute))
+            if (IsFreeDate(timeStamp)) 
+                return 0;
+            if (DoesCostEight(hour, minute))
                 return 8;
             else if (DoesCostThirteen(hour, minute))
                 return 13;
@@ -92,47 +73,45 @@ namespace TollFeeCalculatorApp
             else 
                 return 0;
         }
-
-        private bool DoesCostEigth(int hour, int minute)
+        private bool DoesCostEight(int hour, int minute)
         {
-            if (hour == 6 &&  minute <= 29)
-                return true;
-            else if ((hour == 8 && minute >= 30) || hour == 14 )
-                return true;
-            else if (hour == 18 && minute <= 29)
-                return true;
-            else
-                return false;
+            switch (hour)
+            {
+                case 6 when minute <= 29:
+                case 8 when minute >= 30:
+                case >= 9 when hour <= 14:
+                case 18 when minute <= 29:
+                    return true;
+                default:
+                    return false;
+            }
         }
-       
-
         private bool DoesCostThirteen(int hour, int minute)
         {
-
-            if (hour == 6 && minute >= 30)
-                return true;
-            else if (hour == 8 && hour <= 29)
-                return true;
-            else if (hour == 15 && minute <= 29)
-                return true;
-            else if (hour == 17)
-                return true;
-            else
-                return false;
+            switch (hour)
+            {
+                case 6 when minute >= 30:
+                case 8 when minute <= 29:
+                case 15 when minute <= 29:
+                case 17:
+                    return true;
+                default:
+                    return false;
+            }
         }
-
         private bool DoesCostEighteen(int hour, int minute)
         {
-
-            if (hour == 7)
-                return true;
-            else if ((hour == 15 && minute >= 30) || hour == 16 )
-                return true;
-            else
-                return false;
+            switch (hour)
+            {
+                case 7:
+                case 15 when minute >= 30:
+                case 16:
+                    return true;
+                default:
+                    return false;
+            }
         }
-      
-        private bool FreeDate(DateTime timeStamp) 
+        private bool IsFreeDate(DateTime timeStamp) 
         {
             const int sunday = 0;
             const int saturday = 6;
@@ -141,13 +120,10 @@ namespace TollFeeCalculatorApp
                 || (int)timeStamp.DayOfWeek == sunday 
                 || timeStamp.Month == july;
         }
-
-        private void ResetInterval(List<TollRecord> currentInterval, TollRecord currentRecord)
+        private void ResetInterval(ICollection<TollRecord> currentInterval, TollRecord currentRecord)
         {
             currentInterval.Clear();
             currentInterval.Add(currentRecord);
         }
-
-
     }
 }

@@ -8,11 +8,11 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void Run_FilePathInvalidOrMissing_ShouldHandleException()
         {
-            const string MissingPath = "missing";
-            const string InvalidPath = "";
+            const string missingPath = "missing";
+            const string invalidPath = "";
             var fileReader = new FileReader();
-            fileReader.ReadFileToString(MissingPath);
-            fileReader.ReadFileToString(InvalidPath);
+            fileReader.ReadFileToString(missingPath);
+            fileReader.ReadFileToString(invalidPath);
 
         }
     }

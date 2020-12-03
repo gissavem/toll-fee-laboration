@@ -1,7 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using TollFeeCalculatorApp;
 
 namespace TollFeeCalculatorTests
@@ -9,18 +8,16 @@ namespace TollFeeCalculatorTests
     [TestClass]
     public class TollFeeCalculatorTests
     {
- 
-
         [TestMethod]
         public void GetHighestFeeInInterval_ShouldReturnHighestFee()
         {
-            int expected = 18;
+            var expected = 18;
             var tollFeecalulator = new TollFeeCalculator();
             var timeStampCostEigth = new DateTime(2020, 1, 1, 6, 0, 0);
             var timeStampCostThirteen = new DateTime(2020, 1, 1, 6, 45, 0);
             var timeStampCostEighteen = new DateTime(2020, 1, 1, 7, 0, 0);
             var timeStampFree = new DateTime(2020, 1, 1, 19, 0, 0);
-            var timeStamps = new List<TollRecord>()
+            var timeStamps = new List<TollRecord>
             {
                 new TollRecord(timeStampCostEigth, 8),
                 new TollRecord(timeStampCostThirteen, 13),
@@ -32,52 +29,49 @@ namespace TollFeeCalculatorTests
 
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void CalculateTotalFee_TwoIntervals_ShouldPayOncePerHourInterval()
         {
             var tollFeecalulator = new TollFeeCalculator();
             var expected = 16;
 
-            var timeStamps = new List<TollRecord>()
+            var timeStamps = new List<TollRecord>
             {
-               new TollRecord(new DateTime(2020, 1, 1, 6, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 6, 15, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 6, 20, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 18, 00, 0), 8)
+                new TollRecord(new DateTime(2020, 1, 1, 6, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 6, 15, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 6, 20, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 18, 00, 0), 8)
             };
 
             var actual = tollFeecalulator.CalculateTotalFee(timeStamps);
 
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void CalculateTotalFee_ExceedsMaxFeeAmount_ShouldReturnMaxFee()
         {
             var tollFeecalulator = new TollFeeCalculator();
             var expected = 60;
-  
-            var timeStamps = new List<TollRecord>()
+
+            var timeStamps = new List<TollRecord>
             {
-               new TollRecord(new DateTime(2020, 1, 1, 6, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 7, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 8, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 9, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 10, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 11, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 12, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 13, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 14, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 15, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 16, 0, 0), 8)
+                new TollRecord(new DateTime(2020, 1, 1, 6, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 7, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 8, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 9, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 10, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 11, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 12, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 13, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 14, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 15, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 16, 0, 0), 8)
             };
 
             var actual = tollFeecalulator.CalculateTotalFee(timeStamps);
 
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void CalculateTotalFee_BelowMaxFeeAmount_ShouldReturnActualFee()
         {
@@ -86,10 +80,9 @@ namespace TollFeeCalculatorTests
 
             var timeStamps = new List<TollRecord>()
             {
-               new TollRecord(new DateTime(2020, 1, 1, 6, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 7, 0, 0), 8),
-               new TollRecord(new DateTime(2020, 1, 1, 8, 0, 0), 8)
-
+                new TollRecord(new DateTime(2020, 1, 1, 6, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 7, 0, 0), 8),
+                new TollRecord(new DateTime(2020, 1, 1, 8, 0, 0), 8)
             };
 
             var actual = tollFeecalulator.CalculateTotalFee(timeStamps);
@@ -106,7 +99,7 @@ namespace TollFeeCalculatorTests
             var expectFree = 0;
 
             var tollFeecalulator = new TollFeeCalculator();
-            var firstTimeSpan = new DateTime(2020, 1, 1, 6, 15,0);
+            var firstTimeSpan = new DateTime(2020, 1, 1, 6, 15, 0);
             var secondTimeSpan = new DateTime(2020, 1, 1, 6, 45, 0);
             var thirdTimeSpan = new DateTime(2020, 1, 1, 7, 29, 0);
             var fourthTimeSpan = new DateTime(2020, 1, 1, 8, 14, 0);
@@ -159,17 +152,14 @@ namespace TollFeeCalculatorTests
             Assert.AreEqual(expected, actualThree);
         }
 
-
-
         [TestMethod]
         public void PopulateRecordsWithFees_ShouldPopulateAllRecords()
         {
-
             var timeStampCostEigth = new DateTime(2020, 1, 1, 6, 0, 0);
             var timeStampCostThirteen = new DateTime(2020, 1, 1, 6, 45, 0);
             var timeStampCostEighteen = new DateTime(2020, 1, 1, 7, 0, 0);
-            var timeStampFree = new DateTime(2020, 1, 1, 19, 0, 0); 
-            var emptyRecords = new List<TollRecord>()
+            var timeStampFree = new DateTime(2020, 1, 1, 19, 0, 0);
+            var emptyRecords = new List<TollRecord>
             {
                 new TollRecord(timeStampCostEigth),
                 new TollRecord(timeStampCostThirteen),
@@ -200,7 +190,7 @@ namespace TollFeeCalculatorTests
             var timeStampCostThirteen = new DateTime(2020, 1, 1, 6, 45, 0);
             var timeStampCostEighteen = new DateTime(2020, 1, 1, 7, 0, 0);
             var timeStampFree = new DateTime(2020, 1, 1, 19, 0, 0);
-            var records = new List<TollRecord>()
+            var records = new List<TollRecord>
             {
                 new TollRecord(timeStampCostEigth, 8),
                 new TollRecord(timeStampCostThirteen, 13),

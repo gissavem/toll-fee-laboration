@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using TollFeeCalculatorApp;
 
 namespace TollFeeCalculatorTests
@@ -36,7 +34,6 @@ namespace TollFeeCalculatorTests
             var invalidInput = "xasfasxasfas";
             var dates = dateParser.CreateTollRecordsFromString(invalidInput);
         }
-
         [TestMethod]
         public void GetDifferenceInMinutes_ShouldReturn90()
         {
@@ -44,12 +41,10 @@ namespace TollFeeCalculatorTests
             var firstTime = new DateTime(1970, 1, 1, 10, 0, 0);
             var secondTime = new DateTime(1970, 1, 1, 11, 30, 0);
             var dateParser = new DateParser();
-
-
+            
             var actual = dateParser.GetTimeDelta(firstTime, secondTime);
 
             Assert.AreEqual(expectedMinutes, actual);
         }
-
     }
 }

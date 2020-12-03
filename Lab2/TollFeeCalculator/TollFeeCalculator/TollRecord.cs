@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TollFeeCalculatorApp
 {
@@ -14,7 +10,7 @@ namespace TollFeeCalculatorApp
             Fee = fee;
         }
         public int Fee {  get;  set; }
-        public DateTime TimeStamp { get; set; }
-        public bool HasValue { get { return Fee != 0; } }
+        public DateTime TimeStamp { get; }
+        public bool HasFee => Fee != 0;
     }
 }
